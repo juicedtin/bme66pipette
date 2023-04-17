@@ -9,6 +9,7 @@ int pinAnalogIn = A0;
 int mxTT[9] = { 0000, 1000, 1100, 1010, 1110, 1001, 1101, 1011, 1111 };
 double ambTHold = 0;
 double analogOutputs[dimH + dimV];
+bool pinState[dimH+dimV];
 
 void setup() {
 
@@ -53,18 +54,21 @@ void loop() {
   //Get averaged ambient light value for comparison
   for (int i = 0; i < (dimH + dimV); i++) {
     //Set pinModes according to the index of the photoresistor
-    pinMode(pinMXEN, mxGetPR(i, mxTT, "EN", dimH + dimV));  // Pass size of analogOutputs array as argument
-    pinMode(pinMXA0, mxGetPR(i, mxTT, "A0", dimH + dimV));  // Pass size of analogOutputs array as argument
-    pinMode(pinMXA1, mxGetPR(i, mxTT, "A1", dimH + dimV));  // Pass size of analogOutputs array as argument
-    pinMode(pinMXA2, mxGetPR(i, mxTT, "A2", dimH + dimV));  // Pass size of analogOutputs array as argument
+    pinMode(pinMXEN, mxGetPR(i, mxTT, "EN", dimH + dimV));  
+    pinMode(pinMXA0, mxGetPR(i, mxTT, "A0", dimH + dimV));  
+    pinMode(pinMXA1, mxGetPR(i, mxTT, "A1", dimH + dimV));  
+    pinMode(pinMXA2, mxGetPR(i, mxTT, "A2", dimH + dimV));  
     delayMicroseconds(100);
     analogOutputs[i] = analogRead(pinAnalogIn);
   }
   ambTHold = avgAmbTHold(dimH+dimV, analogOutputs); // Use dimH+dimV instead of sizeof(analogOutputs)/sizeof(analogOutputs[0])
   // Check analog signal of all photoresistors
   for (int j = 0; j < (sizeof(analogOutputs)/sizeof(int)); j++ ) {
-    for (int k = 0; k < 4; k++) {
-      //TODO
-    }
+    pinMode(pinMXEN, mxGetPR(j, mxTT, "EN", dimH + dimV));  
+    pinMode(pinMXA0, mxGetPR(j, mxTT, "A0", dimH + dimV));  
+    pinMode(pinMXA1, mxGetPR(j, mxTT, "A1", dimH + dimV));  
+    pinMode(pinMXA2, mxGetPR(j, mxTT, "A2", dimH + dimV));  
+    delayMicroseconds(100);
+    pinState[j] = (analogRead(pinAnalogIn) > ambTHold);
   }
 }
