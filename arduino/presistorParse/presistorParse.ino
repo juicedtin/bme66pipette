@@ -18,6 +18,7 @@ void setup() {
   pinMode(pinMXA0, OUTPUT);
   pinMode(pinMXA1, OUTPUT);
   pinMode(pinMXA2, OUTPUT);
+  Serial.begin(9600);
 
   // Set pin mode for analog input pin
   pinMode(pinAnalogIn, INPUT);
@@ -68,7 +69,11 @@ void loop() {
     pinMode(pinMXA0, mxGetPR(j, mxTT, "A0", dimH + dimV));  
     pinMode(pinMXA1, mxGetPR(j, mxTT, "A1", dimH + dimV));  
     pinMode(pinMXA2, mxGetPR(j, mxTT, "A2", dimH + dimV));  
-    delayMicroseconds(100);
+    delayMicroseconds(1000);
     pinState[j] = (analogRead(pinAnalogIn) > ambTHold);
   }
+  for (int k = 0; k < (sizeof(pinState)/sizeof(bool)); k++) {
+    Serial.write(pinState[k]);
+  }
+  Serial.write("Pin Read Cycle Complete");
 }
