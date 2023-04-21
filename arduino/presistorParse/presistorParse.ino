@@ -22,6 +22,18 @@ void setup() {
 
   // Set pin mode for analog input pin
   pinMode(pinAnalogIn, INPUT);
+
+  //Identify ambient light level on startup
+  for (int i = 0; i < (dimH + dimV); i++) {
+    //Set pinModes according to the index of the photoresistor
+    pinMode(pinMXEN, mxGetPR(i, mxTT, "EN", dimH + dimV));  
+    pinMode(pinMXA0, mxGetPR(i, mxTT, "A0", dimH + dimV));  
+    pinMode(pinMXA1, mxGetPR(i, mxTT, "A1", dimH + dimV));  
+    pinMode(pinMXA2, mxGetPR(i, mxTT, "A2", dimH + dimV));  
+    delayMicroseconds(100);
+    analogOutputs[i] = analogRead(pinAnalogIn);
+  }
+  ambTHold = avgAmbTHold(dimH+dimV, analogOutputs); // Use dimH+dimV instead of sizeof(analogOutputs)/sizeof(analogOutputs[0])
 }
 
 //Converts the target photoresistor into the high/low boolean of a specific output pin to multiplexer
@@ -53,16 +65,6 @@ double avgAmbTHold(int arrSize, double *valuesIn) {
 
 void loop() {
   //Get averaged ambient light value for comparison
-  for (int i = 0; i < (dimH + dimV); i++) {
-    //Set pinModes according to the index of the photoresistor
-    pinMode(pinMXEN, mxGetPR(i, mxTT, "EN", dimH + dimV));  
-    pinMode(pinMXA0, mxGetPR(i, mxTT, "A0", dimH + dimV));  
-    pinMode(pinMXA1, mxGetPR(i, mxTT, "A1", dimH + dimV));  
-    pinMode(pinMXA2, mxGetPR(i, mxTT, "A2", dimH + dimV));  
-    delayMicroseconds(100);
-    analogOutputs[i] = analogRead(pinAnalogIn);
-  }
-  ambTHold = avgAmbTHold(dimH+dimV, analogOutputs); // Use dimH+dimV instead of sizeof(analogOutputs)/sizeof(analogOutputs[0])
   // Check analog signal of all photoresistors
   for (int j = 0; j < (sizeof(analogOutputs)/sizeof(int)); j++ ) {
     pinMode(pinMXEN, mxGetPR(j, mxTT, "EN", dimH + dimV));  
@@ -74,6 +76,10 @@ void loop() {
   }
   for (int k = 0; k < (sizeof(pinState)/sizeof(bool)); k++) {
     Serial.write(pinState[k]);
+    Serial.write(analogRead(pinAnalogIn));
+    Serial.println();
   }
   Serial.write("Pin Read Cycle Complete");
 }
+
+//TODO: Wire button to allow for manual ambTHold reset

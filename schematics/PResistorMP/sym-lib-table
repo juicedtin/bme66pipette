@@ -1,0 +1,4 @@
+(sym_lib_table
+  (version 7)
+  (lib (name "PRMP ICs")(type "KiCad")(uri "${KIPRJMOD}/PRMP ICs.kicad_sym")(options "")(descr ""))
+)
