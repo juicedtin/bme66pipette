@@ -67,10 +67,10 @@ void loop() {
   //Get averaged ambient light value for comparison
   // Check analog signal of all photoresistors
   for (int j = 0; j < (sizeof(analogOutputs)/sizeof(int)); j++ ) {
-    pinMode(pinMXEN, mxGetPR(j, mxTT, "EN"));  
-    pinMode(pinMXA0, mxGetPR(j, mxTT, "A0"));  
-    pinMode(pinMXA1, mxGetPR(j, mxTT, "A1"));  
-    pinMode(pinMXA2, mxGetPR(j, mxTT, "A2"));  
+    digitalWrite(pinMXEN, mxGetPR(j, mxTT, "EN"));  
+    digitalWrite(pinMXA0, mxGetPR(j, mxTT, "A0"));  
+    digitalWrite(pinMXA1, mxGetPR(j, mxTT, "A1"));  
+    digitalWrite(pinMXA2, mxGetPR(j, mxTT, "A2"));  
     delayMicroseconds(1000);
     pinState[j] = (analogRead(pinAnalogIn) > ambTHold);
   }

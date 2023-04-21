@@ -39,16 +39,18 @@ bool mxGetPR(int tgtR, int tt[9], String pin) {
 void loop() {
   // put your main code here, to run repeatedly:
   for (int i = 0; i < 9; i++) {
-    Serial.print(mxGetPR(i, mxTT, "EN"));
+    /*Serial.print(mxGetPR(i, mxTT, "EN"));
     Serial.print(mxGetPR(i, mxTT, "A0"));
     Serial.print(mxGetPR(i, mxTT, "A1"));
     Serial.print(mxGetPR(i, mxTT, "A2"));
     Serial.println(i);
-    Serial.println();
-    digitalWrite(pinMXEN, mxGetPR(i, mxTT, "EN"));  
-    digitalWrite(pinMXA0, mxGetPR(i, mxTT, "A0"));  
-    digitalWrite(pinMXA1, mxGetPR(i, mxTT, "A1"));  
-    digitalWrite(pinMXA2, mxGetPR(i, mxTT, "A2")); 
-    delay(2000);     
+    Serial.println();*/
+    digitalWrite(pinMXEN, 1);  
+    digitalWrite(pinMXA0, 0);  
+    digitalWrite(pinMXA1, 1);  
+    digitalWrite(pinMXA2, 0); 
+    delay(100);
+    Serial.print(analogRead(pinAnalogIn));    
+    Serial.print("\n"); 
   }
 }
