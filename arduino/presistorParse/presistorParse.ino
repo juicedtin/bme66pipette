@@ -1,10 +1,10 @@
 // Declare global variables
 const int dimH = 3;
 const int dimV = 3;
-int pinMXEN = 1;
-int pinMXA0 = 2;
-int pinMXA1 = 3;
-int pinMXA2 = 4;
+int pinMXEN = 0;
+int pinMXA0 = 1;
+int pinMXA1 = 2;
+int pinMXA2 = 3;
 int pinAnalogIn = A0;
 int mxTT[9] = { 0000, 1000, 1100, 1010, 1110, 1001, 1101, 1011, 1111 };
 double ambTHold = 0;
@@ -37,7 +37,7 @@ void setup() {
 }
 
 //Converts the target photoresistor into the high/low boolean of a specific output pin to multiplexer
-bool mxGetPR(int tgtR, int tt[9], String pin, int size) {
+bool mxGetPR(int tgtR, int tt[9], String pin) {
   //Output pin high/low in the order EN, A0, A1, A2
   int pinStates[4] = { tt[tgtR] / 1000, (tt[tgtR] / 100) % 10, (tt[tgtR] / 10) % 10, tt[tgtR] % 10 };
   //Return booleans according to the pinStates array, return false as default
@@ -67,10 +67,10 @@ void loop() {
   //Get averaged ambient light value for comparison
   // Check analog signal of all photoresistors
   for (int j = 0; j < (sizeof(analogOutputs)/sizeof(int)); j++ ) {
-    pinMode(pinMXEN, mxGetPR(j, mxTT, "EN", dimH + dimV));  
-    pinMode(pinMXA0, mxGetPR(j, mxTT, "A0", dimH + dimV));  
-    pinMode(pinMXA1, mxGetPR(j, mxTT, "A1", dimH + dimV));  
-    pinMode(pinMXA2, mxGetPR(j, mxTT, "A2", dimH + dimV));  
+    pinMode(pinMXEN, mxGetPR(j, mxTT, "EN"));  
+    pinMode(pinMXA0, mxGetPR(j, mxTT, "A0"));  
+    pinMode(pinMXA1, mxGetPR(j, mxTT, "A1"));  
+    pinMode(pinMXA2, mxGetPR(j, mxTT, "A2"));  
     delayMicroseconds(1000);
     pinState[j] = (analogRead(pinAnalogIn) > ambTHold);
   }
