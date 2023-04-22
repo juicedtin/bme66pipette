@@ -37,10 +37,13 @@ void loop() {
     //Read all analog pins
     analogOutputs[i] = analogRead(prAnalogIn[i]);
     delayMicroseconds(100);
-    Serial.print(String(i)+",");
-    Serial.print(analogOutputs[i]);
-    Serial.println();
   }
+  String strOut = "[";
+  for (int j = 0; j < (dimH+dimV); j++) {
+    strOut = strOut + String(analogOutputs[j])+",";
+  }
+  strOut += "]";
+  Serial.print(strOut);
   Serial.print("Pin Read Cycle Complete");
   Serial.println();
 }
