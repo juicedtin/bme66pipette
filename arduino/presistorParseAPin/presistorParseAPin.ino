@@ -1,6 +1,6 @@
 // Declare global variables
-const int dimH = 3;
-const int dimV = 3;
+const int dimH = 2;
+const int dimV = 2;
 int prAnalogIn[]={A0,A1,A2,A3,A4,A5,A6};
 double ambTHold = 0;
 double analogOutputs[dimH + dimV];
@@ -35,15 +35,14 @@ void loop() {
   // Check analog signal of all photoresistors
   for (int i = 0; i < (dimH + dimV); i++) {
     //Read all analog pins
-    delayMicroseconds(100);
     analogOutputs[i] = analogRead(prAnalogIn[i]);
-  }
-  for (int j = 0; j < (sizeof(pinState)/sizeof(bool)); j++) {
-    Serial.write(pinState[j]);
-    Serial.write(analogRead(prAnalogIn[j]));
+    delayMicroseconds(100);
+    Serial.print(String(i)+",");
+    Serial.print(analogOutputs[i]);
     Serial.println();
   }
-  Serial.write("Pin Read Cycle Complete");
+  Serial.print("Pin Read Cycle Complete");
+  Serial.println();
 }
 
 //TODO: Wire button to allow for manual ambTHold reset
