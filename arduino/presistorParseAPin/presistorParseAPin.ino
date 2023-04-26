@@ -2,8 +2,10 @@
 const int dimH = 2;
 const int dimV = 2;
 int prAnalogIn[]={A0,A1,A2,A3,A4,A5,A6};
+int pinReset = 0;
 double ambTHold = 0;
 double analogOutputs[dimH + dimV];
+double analogInit[dimH+dimV];
 bool pinState[dimH+dimV];
 
 //Average double values sequentially through an array (used for ambient light threshold)
@@ -20,6 +22,7 @@ void setup() {
   for (int i = 0; i < dimH+dimV; i++) {
     pinMode(prAnalogIn[i], INPUT);
   }
+  pinMode(pinReset, INPUT); // Set pin mode for button reset pin
   //Start serial output
   Serial.begin(9600);
   //Identify ambient light level on startup
@@ -28,24 +31,57 @@ void setup() {
     delayMicroseconds(100);
     analogOutputs[i] = analogRead(prAnalogIn[i]);
   }
-  ambTHold = avgAmbTHold(dimH+dimV, analogOutputs); // Use dimH+dimV instead of sizeof(analogOutputs)/sizeof(analogOutputs[0])
+  ambTHold = avgAmbTHold(dimH+dimV, analogOutputs); //Find ambient light threshold
 }
 
 void loop() {
-  // Check analog signal of all photoresistors
+  
+  // Check analog signal of all photoresistors if reset button is hit
+  if (digitalRead(pinReset) == HIGH) {
+    Serial.print("RESET");
+    Serial.println();
+  //Identify ambient light level on startup
+    for (int i = 0; i < (dimH + dimV); i++) {
+      //Read all analog pins
+      delayMicroseconds(100);
+      analogInit[i] = analogRead(prAnalogIn[i]);
+    }
+  ambTHold = avgAmbTHold(dimH+dimV, analogInit); //Find ambient light threshold    
+  }
+
+  //Output raw ADC values for all analog pins
   for (int i = 0; i < (dimH + dimV); i++) {
     //Read all analog pins
     analogOutputs[i] = analogRead(prAnalogIn[i]);
     delayMicroseconds(100);
   }
+  //Write voltage string for strToList
   String strOut = "[";
   for (int j = 0; j < (dimH+dimV); j++) {
-    strOut = strOut + String(analogOutputs[j])+",";
+    strOut = strOut + String(analogOutputs[j]);
+    if (j != (dimH+dimV-1)) {
+      strOut += ",";
+    }
   }
   strOut += "]";
   Serial.print(strOut);
-  Serial.print("Pin Read Cycle Complete");
   Serial.println();
-}
+  Serial.print("PINREAD COMPLETE");
+  Serial.println();
 
-//TODO: Wire button to allow for manual ambTHold reset
+  String blockOut = "[";
+  for (int k = 0; k < dimH+dimV; k++) {
+    if (analogOutputs[k] >= (analogInit[k]-100)) {
+      blockOut = blockOut + String(k);
+      if (k != (dimH+dimV-1)) {
+        strOut += ",";
+      }
+    }
+  }
+  blockOut+= "]";
+  Serial.print(blockOut);
+  Serial.println();
+  Serial.print("BLOCKOUT PARSED");
+  Serial.println();
+  
+}
