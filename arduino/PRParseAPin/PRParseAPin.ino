@@ -23,6 +23,7 @@ void setup() {
     pinMode(prAnalogIn[i], INPUT);
   }
   pinMode(pinReset, INPUT); // Set pin mode for button reset pin
+  digitalWrite(pinReset, LOW);
   //Start serial output
   Serial.begin(9600);
   //Identify ambient light level on startup
@@ -71,10 +72,10 @@ void loop() {
 
   String blockOut = "[";
   for (int k = 0; k < dimH+dimV; k++) {
-    if (analogOutputs[k] >= (analogInit[k]-100)) {
+    if (analogOutputs[k] >= (analogInit[k])) {
       blockOut = blockOut + String(k);
       if (k != (dimH+dimV-1)) {
-        strOut += ",";
+        blockOut += ",";
       }
     }
   }
@@ -83,5 +84,5 @@ void loop() {
   Serial.println();
   Serial.print("BLOCKOUT PARSED");
   Serial.println();
-  
+  delay(2000);
 }
