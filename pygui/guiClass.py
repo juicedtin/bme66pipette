@@ -1,8 +1,11 @@
 import tkinter as tk
+from serialParse import SerialDataProcessor
+import threading
 
 class WellPlateGUI(tk.Tk):
     def __init__(self):
         super().__init__()
+
 
         self.title("96-Well Plate")
         self.geometry("700x500")
@@ -14,6 +17,36 @@ class WellPlateGUI(tk.Tk):
         self.create_well_plate()
         self.create_input()
 
+        # Initialize the SerialDataProcessor instance
+        self.serial_data_processor = SerialDataProcessor(port='COM3', baudrate=9600)
+
+        # Create a thread to process serial data
+        self.serial_thread = threading.Thread(target=self.read_serial_data, daemon=True)
+        self.serial_thread.start()        
+
+    def read_serial_data(self):
+        while True:
+            self.serial_processor.process_serial_data()
+            # Update the GUI with the received data
+            self.update_gui()
+
+    def update_gui(self):
+        # Check if new analog data is available
+        if self.serial_processor.pinread_event.is_set():
+            analog_data = self.serial_processor.analog_data
+            #TODO STUFF HERE
+            self.serial_processor.pinread_event.clear()
+
+        # Check if new integer data is available
+        elif self.serial_processor.blockout_event.is_set():
+            integer_data = self.serial_processor.integer_data
+            #TODO STUFF HERE
+            self.serial_processor.blockout_event.clear()
+
+        # No new data
+        else:
+            pass
+    
     def create_well_plate(self):
         self.canvas = tk.Canvas(self, width=self.well_diameter * 13, height=self.well_diameter * 9)
         self.canvas.pack(pady=20)

@@ -1,10 +1,13 @@
 import serial
+import threading
 
 class SerialDataProcessor:
     def __init__(self, port, baudrate):
         self.ser = serial.Serial(port, baudrate, timeout=1)
         self.analog_data = []
         self.integer_data = []
+        self.pinread_event = threading.Event()
+        self.blockout_event = threading.Event()        
 
     def process_serial_data(self):
         # Read one line from serial input
@@ -16,6 +19,7 @@ class SerialDataProcessor:
             analog_data_str = self.ser.readline().decode().strip()
             if analog_data_str.startswith('[') and ']' in analog_data_str:
                 self.analog_data = eval(analog_data_str)
+            self.pinread_event.set()
 
         elif data == "BLOCKOUT":
             # Clear the previous integer data and read new data
@@ -23,6 +27,7 @@ class SerialDataProcessor:
             integer_data_str = self.ser.readline().decode().strip()
             if integer_data_str.startswith('[') and ']' in integer_data_str:
                 self.integer_data = eval(integer_data_str)
+            self.blockout_event.set()
 
         elif data == "RESET":
             # Ignore reset signal
@@ -30,4 +35,5 @@ class SerialDataProcessor:
 
         else:
             # Unknown data
+            print()
             pass
