@@ -56,7 +56,10 @@ void loop() {
     analogOutputs[i] = analogRead(prAnalogIn[i]);
     delayMicroseconds(100);
   }
+
   //Write voltage string for strToList
+  Serial.print("PINREAD");
+  Serial.println();  
   String strOut = "[";
   for (int j = 0; j < (dimH+dimV); j++) {
     strOut = strOut + String(analogOutputs[j]);
@@ -67,9 +70,9 @@ void loop() {
   strOut += "]";
   Serial.print(strOut);
   Serial.println();
-  Serial.print("PINREAD COMPLETE");
-  Serial.println();
 
+  Serial.print("BLOCKOUT");
+  Serial.println();
   String blockOut = "[";
   for (int k = 0; k < dimH+dimV; k++) {
     if (analogOutputs[k] >= (analogInit[k])) {
@@ -81,8 +84,6 @@ void loop() {
   }
   blockOut+= "]";
   Serial.print(blockOut);
-  Serial.println();
-  Serial.print("BLOCKOUT PARSED");
   Serial.println();
   delay(2000);
 }
