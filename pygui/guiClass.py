@@ -41,6 +41,7 @@ class WellPlateGUI(tk.Tk):
         # Check if new integer data is available
         elif self.serial_processor.blockout_event.is_set():
             blockout_data = self.serial_processor.blockout_data
+            print(blockout_data)
             for ele in self.cellInterp(blockout_data, self.wellKey):
                 tempstr = tk.StringVar()
                 tempstr.set(ele)
@@ -53,12 +54,14 @@ class WellPlateGUI(tk.Tk):
             pass
     
     def cellInterp(self, blockout, wellKey):
-        blockout = [math.ceil(x/2) for x in blockout]
+        blockout = [(math.ceil((x+1)/2)-1) for x in blockout]
+        print(blockout)
         blockedWells = []
         for i in blockout:
             for j in blockout:
-                if i != j:
+                if not (wellKey[i][j] in blockedWells):
                     blockedWells.append(wellKey[i][j])
+        print(blockedWells)
         return blockedWells
 
 
