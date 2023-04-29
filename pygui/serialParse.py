@@ -4,8 +4,8 @@ import threading
 class SerialDataProcessor:
     def __init__(self, port, baudrate):
         self.ser = serial.Serial(port, baudrate, timeout=1)
-        self.analog_data = []
-        self.integer_data = []
+        self.adc_data = []
+        self.blockout_data = []
         self.pinread_event = threading.Event()
         self.blockout_event = threading.Event()        
 
@@ -15,18 +15,18 @@ class SerialDataProcessor:
 
         if data == "PINREAD":
             # Clear the previous analog data and read new data
-            self.analog_data = []
-            analog_data_str = self.ser.readline().decode().strip()
-            if analog_data_str.startswith('[') and ']' in analog_data_str:
-                self.analog_data = eval(analog_data_str)
+            self.adc_data = []
+            adc_data_str = self.ser.readline().decode().strip()
+            if adc_data_str.startswith('[') and ']' in adc_data_str:
+                self.adc_data = eval(adc_data_str)
             self.pinread_event.set()
 
         elif data == "BLOCKOUT":
             # Clear the previous integer data and read new data
-            self.integer_data = []
-            integer_data_str = self.ser.readline().decode().strip()
-            if integer_data_str.startswith('[') and ']' in integer_data_str:
-                self.integer_data = eval(integer_data_str)
+            self.blockout_data = []
+            blockout_data_str = self.ser.readline().decode().strip()
+            if blockout_data_str.startswith('[') and ']' in blockout_data_str:
+                self.blockout_data = eval(blockout_data_str)
             self.blockout_event.set()
 
         elif data == "RESET":

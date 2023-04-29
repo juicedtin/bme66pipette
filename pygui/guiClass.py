@@ -19,7 +19,7 @@ class WellPlateGUI(tk.Tk):
         self.create_input()
 
         # Initialize the SerialDataProcessor instance
-        self.serial_data_processor = SerialDataProcessor(port='COM3', baudrate=9600)
+        self.serial_processor = SerialDataProcessor(port='COM3', baudrate=9600)
 
         # Create a thread to process serial data
         self.serial_thread = threading.Thread(target=self.read_serial_data, daemon=True)
