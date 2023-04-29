@@ -1,12 +1,13 @@
 import tkinter as tk
 from serialParse import SerialDataProcessor
 import threading
+import math
 
 class WellPlateGUI(tk.Tk):
     def __init__(self):
         super().__init__()
 
-
+        self.wellKey = [["A1","A2"],["B1","B2"]]
         self.title("96-Well Plate")
         self.geometry("700x500")
         self.well_diameter = 40
@@ -33,20 +34,34 @@ class WellPlateGUI(tk.Tk):
     def update_gui(self):
         # Check if new analog data is available
         if self.serial_processor.pinread_event.is_set():
-            analog_data = self.serial_processor.analog_data
-            #TODO STUFF HERE
+            adc_data = self.serial_processor.adc_data
+            print(adc_data)
             self.serial_processor.pinread_event.clear()
 
         # Check if new integer data is available
         elif self.serial_processor.blockout_event.is_set():
-            integer_data = self.serial_processor.integer_data
-            #TODO STUFF HERE
+            blockout_data = self.serial_processor.blockout_data
+            for ele in self.cellInterp(blockout_data, self.wellKey):
+                tempstr = tk.StringVar()
+                tempstr.set(ele)
+                self.entry.configure(textvariable=tempstr)
+                self.update_well()
             self.serial_processor.blockout_event.clear()
 
         # No new data
         else:
             pass
     
+    def cellInterp(self, blockout, wellKey):
+        blockout = [math.ceil(x/2) for x in blockout]
+        blockedWells = []
+        for i in blockout:
+            for j in blockout:
+                if i != j:
+                    blockedWells.append(wellKey[i][j])
+        return blockedWells
+
+
     def create_well_plate(self):
         self.canvas = tk.Canvas(self, width=self.well_diameter * 13, height=self.well_diameter * 9)
         self.canvas.pack(pady=20)
