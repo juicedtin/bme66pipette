@@ -2,6 +2,7 @@ import tkinter as tk
 from serialParse import SerialDataProcessor
 import threading
 import math
+import time
 
 class WellPlateGUI(tk.Tk):
     def __init__(self):
@@ -26,12 +27,14 @@ class WellPlateGUI(tk.Tk):
         self.serial_thread.start()        
 
     def read_serial_data(self):
+        global last_output, output_count
         while True:
-            self.serial_processor.process_serial_data()
+            cycleStartTime = time.time()
+            self.serial_processor.process_serial_data(cycleStartTime)
             # Update the GUI with the received data
-            self.update_gui()
+            self.ser_update_gui()
 
-    def update_gui(self):
+    def ser_update_gui(self):
         # Check if new analog data is available
         if self.serial_processor.pinread_event.is_set():
             adc_data = self.serial_processor.adc_data

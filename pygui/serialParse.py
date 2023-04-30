@@ -1,5 +1,6 @@
 import serial
 import threading
+import time
 
 class SerialDataProcessor:
     def __init__(self, port, baudrate):
@@ -7,9 +8,12 @@ class SerialDataProcessor:
         self.adc_data = []
         self.blockout_data = []
         self.pinread_event = threading.Event()
-        self.blockout_event = threading.Event()        
+        self.blockout_event = threading.Event()
+        self.last_blockout_data = []
+        self.total_output_ct = 0
+        self.same_output_ct = 0       
 
-    def process_serial_data(self):
+    def process_serial_data(self, start_time):
         # Read one line from serial input
         data = self.ser.readline().decode().strip().upper()
 
@@ -23,11 +27,20 @@ class SerialDataProcessor:
 
         elif data == "BLOCKOUT":
             # Clear the previous integer data and read new data
+            current_time = time.time()
+            self.last_blockout_data = self.blockout_data
             self.blockout_data = []
             blockout_data_str = self.ser.readline().decode().strip()
             if blockout_data_str.startswith('[') and ']' in blockout_data_str:
                 self.blockout_data = eval(blockout_data_str)
-            self.blockout_event.set()
+                self.total_output_ct +=1
+                if (self.blockout_data == self.last_blockout_data):
+                    self.same_output_ct += 1
+            if self.total_output_ct > 0 and self.same_output_ct == self.total_output_ct and current_time-start_time >= 1:
+                self.blockout_event.set()
+                self.total_output_ct = 0
+                self.same_output_ct = 0
+            time.sleep(0.1)
 
         elif data == "RESET":
             # Ignore reset signal
