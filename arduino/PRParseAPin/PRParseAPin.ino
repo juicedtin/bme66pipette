@@ -49,7 +49,7 @@ void loop() {
     }
   ambTHold = avgAmbTHold(dimH+dimV, analogInit); //Find ambient light threshold    
   }
-
+  
   //Output raw ADC values for all analog pins
   for (int i = 0; i < (dimH + dimV); i++) {
     //Read all analog pins

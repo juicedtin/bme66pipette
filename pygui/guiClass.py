@@ -67,7 +67,6 @@ class WellPlateGUI(tk.Tk):
     
     def cellInterp(self, blockout, wellKey):
         blockout = [(math.ceil((x+1)/2)-1) for x in blockout]
-        print(blockout)
         blockedWells = []
         for i in blockout:
             for j in blockout:
