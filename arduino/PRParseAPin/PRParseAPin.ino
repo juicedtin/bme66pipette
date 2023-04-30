@@ -22,7 +22,7 @@ void setup() {
   for (int i = 0; i < dimH+dimV; i++) {
     pinMode(prAnalogIn[i], INPUT);
   }
-  pinMode(pinReset, INPUT_PULLUP); // Set pin mode for button reset pin
+  pinMode(pinReset, INPUT); // Set pin mode for button reset pin
   digitalWrite(pinReset, LOW);
   //Start serial output
   Serial.begin(9600);
@@ -38,7 +38,7 @@ void setup() {
 void loop() {
   
   // Check analog signal of all photoresistors if reset button is hit
-  if (digitalRead(pinReset) == LOW) {
+  if (digitalRead(pinReset) == HIGH) {
     Serial.print("RESET");
     Serial.println();
   //Identify ambient light level on startup
@@ -75,7 +75,7 @@ void loop() {
   Serial.println();
   String blockOut = "[";
   for (int k = 0; k < dimH+dimV; k++) {
-    if (analogOutputs[k] >= (analogInit[k])) {
+    if (analogOutputs[k] >= (analogInit[k]+50)) {
       blockOut = blockOut + String(k);
       if (k != (dimH+dimV-1)) {
         blockOut += ",";
