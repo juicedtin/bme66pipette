@@ -76,14 +76,14 @@ void loop() {
   String blockOut = "[";
   for (int k = 0; k < dimH+dimV; k++) {
     if (analogOutputs[k] >= (analogInit[k]+50)) {
-      blockOut = blockOut + String(k);
-      if (k != (dimH+dimV-1)) {
-        blockOut += ",";
-      }
+      blockOut = blockOut + String(k) + ",";
     }
   }
-  blockOut+= "]";
+  if(blockOut.length() > 1) {
+    blockOut.remove(blockOut.length()-1);
+  }
+  blockOut += "]";
   Serial.print(blockOut);
   Serial.println();
-  delay(2000);
+  delay(500);
 }

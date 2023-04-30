@@ -13,7 +13,7 @@ class SerialDataProcessor:
         self.total_output_ct = 0
         self.same_output_ct = 0       
 
-    def process_serial_data(self, start_time):
+    def process_serial_data(self):
         # Read one line from serial input
         data = self.ser.readline().decode().strip().upper()
 
@@ -33,14 +33,7 @@ class SerialDataProcessor:
             blockout_data_str = self.ser.readline().decode().strip()
             if blockout_data_str.startswith('[') and ']' in blockout_data_str:
                 self.blockout_data = eval(blockout_data_str)
-                self.total_output_ct +=1
-                if (self.blockout_data == self.last_blockout_data):
-                    self.same_output_ct += 1
-            if self.total_output_ct > 0 and self.same_output_ct == self.total_output_ct and current_time-start_time >= 1:
-                self.blockout_event.set()
-                self.total_output_ct = 0
-                self.same_output_ct = 0
-            time.sleep(0.1)
+            self.blockout_event.set()     
 
         elif data == "RESET":
             # Ignore reset signal

@@ -19,20 +19,29 @@ class WellPlateGUI(tk.Tk):
         self.create_well_plate()
         self.create_input()
 
+        self.timer_event = threading.Event()
+
         # Initialize the SerialDataProcessor instance
         self.serial_processor = SerialDataProcessor(port='COM3', baudrate=9600)
 
         # Create a thread to process serial data
         self.serial_thread = threading.Thread(target=self.read_serial_data, daemon=True)
-        self.serial_thread.start()        
+        self.serial_thread.start()
+
+        #Looping Timer
+        self.timer = threading.Thread(target=self.secTimer, daemon=True) 
+        self.timer.start()       
 
     def read_serial_data(self):
-        global last_output, output_count
         while True:
-            cycleStartTime = time.time()
-            self.serial_processor.process_serial_data(cycleStartTime)
+            self.serial_processor.process_serial_data()
             # Update the GUI with the received data
             self.ser_update_gui()
+
+    def secTimer(self):
+        while True:
+            self.timer_event.set()
+            time.sleep(5)
 
     def ser_update_gui(self):
         # Check if new analog data is available
