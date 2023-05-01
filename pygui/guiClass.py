@@ -4,17 +4,20 @@ import threading
 import math
 import time
 
+
 class WellPlateGUI(tk.Tk):
     def __init__(self):
         super().__init__()
 
-        self.wellKey = [["A1","A2"],["B1","B2"]]
+        self.row_dict = {0: 'A', 2: 'B', 4: 'C', 6: 'D', 8: 'E', 10: 'F', 12: 'G', 14: 'H'}
+        self.col_dict = {1: 1, 3: 2, 5: 3, 7: 4, 9: 5, 11: 6, 13: 7, 15: 8}
         self.title("96-Well Plate")
         self.geometry("700x500")
         self.well_diameter = 40
 
         self.well_counts = {}
-        self.colors = ["green", "blue", "red", "orange", "yellow", "purple", "indigo", "violet", "pink", "cyan", "brown", "teal"]
+        self.colors = ["green", "blue", "red", "orange", "yellow", "purple", "indigo", "violet", "pink", "cyan",
+                       "brown", "teal"]
 
         self.create_well_plate()
         self.create_input()
@@ -28,15 +31,15 @@ class WellPlateGUI(tk.Tk):
         self.serial_thread = threading.Thread(target=self.read_serial_data, daemon=True)
         self.serial_thread.start()
 
-        #Looping Timer
-        self.timer = threading.Thread(target=self.secTimer, daemon=True) 
-        self.timer.start()       
+        # Looping Timer
+        self.timer = threading.Thread(target=self.secTimer, daemon=True)
+        self.timer.start()
 
     def read_serial_data(self):
         while True:
-            self.serial_processor.process_serial_data()
+           self.serial_processor.process_serial_data()
+           self.ser_update_gui()
             # Update the GUI with the received data
-            self.ser_update_gui()
 
     def secTimer(self):
         while True:
@@ -54,7 +57,7 @@ class WellPlateGUI(tk.Tk):
         elif self.serial_processor.blockout_event.is_set():
             blockout_data = self.serial_processor.blockout_data
             print(blockout_data)
-            for ele in self.cellInterp(blockout_data, self.wellKey):
+            for ele in self.cellInterp(blockout_data):
                 tempstr = tk.StringVar()
                 tempstr.set(ele)
                 self.entry.configure(textvariable=tempstr)
@@ -64,17 +67,26 @@ class WellPlateGUI(tk.Tk):
         # No new data
         else:
             pass
-    
-    def cellInterp(self, blockout, wellKey):
-        blockout = [(math.ceil((x+1)/2)-1) for x in blockout]
+
+    def cellInterp(self, blockout):
+        print(blockout)
+        tempRow = 0
+        tempCol = 0
         blockedWells = []
         for i in blockout:
+            if i % 2 == 0:
+                tempRow = self.row_dict[i]
+            else:
+                tempCol = self.col_dict[i]
             for j in blockout:
-                if not (wellKey[i][j] in blockedWells):
-                    blockedWells.append(wellKey[i][j])
+                if j % 2 == 0:
+                    tempRow = self.row_dict[j]
+                else:
+                    tempCol = self.col_dict[j]
+            if not (f"{tempRow}{tempCol}" in blockedWells):
+                    blockedWells.append(f"{tempRow}{tempCol}")
         print(blockedWells)
         return blockedWells
-
 
     def create_well_plate(self):
         self.canvas = tk.Canvas(self, width=self.well_diameter * 13, height=self.well_diameter * 9)
@@ -120,6 +132,7 @@ class WellPlateGUI(tk.Tk):
         x1 = x0 + self.well_diameter
         y1 = y0 + self.well_diameter
 
+
         self.well_counts[well_id] = self.well_counts.get(well_id, 0) + 1
 
         color_index = (self.well_counts[well_id] - 1) % len(self.colors)
@@ -146,6 +159,7 @@ class WellPlateGUI(tk.Tk):
             return False
 
         return True
+
 
 if __name__ == "__main__":
     app = WellPlateGUI()
