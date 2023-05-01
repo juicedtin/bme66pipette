@@ -74,12 +74,12 @@ class WellPlateGUI(tk.Tk):
         tempCol = 0
         blockedWells = []
         for i in blockout:
-            if i % 2 == 0:
+            if i % 2 == 0 or i == 0:
                 tempRow = self.row_dict[i]
             else:
                 tempCol = self.col_dict[i]
             for j in blockout:
-                if j % 2 == 0:
+                if j % 2 == 0 or j == 0:
                     tempRow = self.row_dict[j]
                 else:
                     tempCol = self.col_dict[j]

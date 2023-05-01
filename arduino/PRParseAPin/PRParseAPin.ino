@@ -5,6 +5,7 @@ int prAnalogIn[]={A0,A1,A2,A3,A4,A5,A6};
 int pinReset = 0;
 double ambThreshold[dimH+dimV];
 double analogOutputs[dimH + dimV];
+double laserDiff[]={100,30,100,100};
 bool pinState[dimH+dimV];
 
 //Average double values sequentially through an array (used for ambient light threshold)
@@ -72,7 +73,7 @@ void loop() {
   Serial.println();
   String blockOut = "[";
   for (int k = 0; k < dimH+dimV; k++) {
-    if (analogOutputs[k] >= (ambThreshold[k]+50)) {
+    if (analogOutputs[k] >= (ambThreshold[k]+laserDiff[k])) {
       blockOut = blockOut + String(k) + ",";
     }
   }
