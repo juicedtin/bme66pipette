@@ -3,9 +3,8 @@ const int dimH = 2;
 const int dimV = 2;
 int prAnalogIn[]={A0,A1,A2,A3,A4,A5,A6};
 int pinReset = 0;
-double ambTHold = 0;
+double ambThreshold[dimH+dimV];
 double analogOutputs[dimH + dimV];
-double analogInit[dimH+dimV];
 bool pinState[dimH+dimV];
 
 //Average double values sequentially through an array (used for ambient light threshold)
@@ -30,9 +29,8 @@ void setup() {
   for (int i = 0; i < (dimH + dimV); i++) {
     //Read all analog pins
     delayMicroseconds(100);
-    analogOutputs[i] = analogRead(prAnalogIn[i]);
+    ambThreshold[i] = analogRead(prAnalogIn[i]);
   }
-  ambTHold = avgAmbTHold(dimH+dimV, analogOutputs); //Find ambient light threshold
 }
 
 void loop() {
@@ -45,9 +43,8 @@ void loop() {
     for (int i = 0; i < (dimH + dimV); i++) {
       //Read all analog pins
       delayMicroseconds(100);
-      analogInit[i] = analogRead(prAnalogIn[i]);
+      ambThreshold[i] = analogRead(prAnalogIn[i]);
     }
-  ambTHold = avgAmbTHold(dimH+dimV, analogInit); //Find ambient light threshold    
   }
   
   //Output raw ADC values for all analog pins
@@ -75,7 +72,7 @@ void loop() {
   Serial.println();
   String blockOut = "[";
   for (int k = 0; k < dimH+dimV; k++) {
-    if (analogOutputs[k] >= (analogInit[k]+50)) {
+    if (analogOutputs[k] >= (ambThreshold[k]+50)) {
       blockOut = blockOut + String(k) + ",";
     }
   }
